@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 27, 2017 at 05:55 PM
+-- Generation Time: May 30, 2017 at 05:35 PM
 -- Server version: 10.1.21-MariaDB
 -- PHP Version: 5.6.30
 
@@ -17,7 +17,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `dbrestaurant`
+-- Database: `dbrestaurant_gojek`
 --
 
 -- --------------------------------------------------------
@@ -50,8 +50,8 @@ CREATE TABLE `restaurant` (
   `PHONE` varchar(15) NOT NULL,
   `EMAIL` varchar(50) NOT NULL,
   `TIME_OPEN` int(11) NOT NULL,
-  `LATITUDE` decimal(10,10) NOT NULL,
-  `LONGITUDE` decimal(10,10) NOT NULL,
+  `LATITUDE` double NOT NULL,
+  `LONGITUDE` double NOT NULL,
   `BIO` text NOT NULL,
   `USERNAME` varchar(30) NOT NULL,
   `PASSWORD` varchar(255) NOT NULL,
@@ -67,20 +67,20 @@ CREATE TABLE `restaurant` (
 DROP TABLE IF EXISTS `time_open`;
 CREATE TABLE `time_open` (
   `NO` int(11) NOT NULL,
-  `TIME_OPEN_MONDAY` time NOT NULL,
-  `TIME_CLOSE_MONDAY` time NOT NULL,
-  `TIME_OPEN_TUESDAY` time NOT NULL,
-  `TIME_CLOSE_TUESDAY` time NOT NULL,
-  `TIME_OPEN_WEDNESDAY` time NOT NULL,
-  `TIME_CLOSE_WEDNESDAY` time NOT NULL,
-  `TIME_OPEN_THURSDAY` time NOT NULL,
-  `TIME_CLOSE_THURSDAY` time NOT NULL,
-  `TIME_OPEN_FRIDAY` time NOT NULL,
-  `TIME_CLOSE_FRIDAY` time NOT NULL,
-  `TIME_OPEN_SATURDAY` time NOT NULL,
-  `TIME_CLOSE_SATURDAY` time NOT NULL,
-  `TIME_OPEN_SUNDAY` time NOT NULL,
-  `TIME_CLOSE_SUNDAY` time NOT NULL
+  `TIME_OPEN_MONDAY` time DEFAULT NULL,
+  `TIME_CLOSE_MONDAY` time DEFAULT NULL,
+  `TIME_OPEN_TUESDAY` time DEFAULT NULL,
+  `TIME_CLOSE_TUESDAY` time DEFAULT NULL,
+  `TIME_OPEN_WEDNESDAY` time DEFAULT NULL,
+  `TIME_CLOSE_WEDNESDAY` time DEFAULT NULL,
+  `TIME_OPEN_THURSDAY` time DEFAULT NULL,
+  `TIME_CLOSE_THURSDAY` time DEFAULT NULL,
+  `TIME_OPEN_FRIDAY` time DEFAULT NULL,
+  `TIME_CLOSE_FRIDAY` time DEFAULT NULL,
+  `TIME_OPEN_SATURDAY` time DEFAULT NULL,
+  `TIME_CLOSE_SATURDAY` time DEFAULT NULL,
+  `TIME_OPEN_SUNDAY` time DEFAULT NULL,
+  `TIME_CLOSE_SUNDAY` time DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -186,17 +186,17 @@ ALTER TABLE `menu`
 -- AUTO_INCREMENT for table `restaurant`
 --
 ALTER TABLE `restaurant`
-  MODIFY `NO` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `NO` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT for table `time_open`
 --
 ALTER TABLE `time_open`
-  MODIFY `NO` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `NO` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `NO` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `NO` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 --
 -- Constraints for dumped tables
 --
