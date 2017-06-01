@@ -308,5 +308,45 @@ $app->delete('/menu/delete/{id}', function($request,$response){
     return $response;
   }
 });
+//effendy
+function rad($x){
+    return $x * (3.14) / 180;
+}
 
+function haversine($p1,$p2){
+    $r = 6378137;
+    $dLat = rad($p2['latitude'] - $p1['latitude']);
+    $dLong = rad($p2['longitude'] - $p1['longitude']);
+    $a = Math.sin($dLat/2)*Math.sin($dLat/2)+Math.cos(rad($p1['latitude'])) * Math.cos(rad($p2['latitude'])) *
+        Math.sin(dLong / 2) * Math.sin(dLong / 2);
+    $c = 2 * Math.atan2(Math.sqrt($a),Math.sqrt(1-$a));
+    return $r*$c;
+}
+
+$app->post('/user/login',function($request,$response){
+    new Database("dbrestaurant");
+    $apikey = $request->getHeader('APIKEY');
+    new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
+    $username = $request->getParam('username');
+    $password = crypt($request->getParam('password'),CRYPTKEY);
+    $user = User::where(['USERNAME'=>$username,'PASSWORD'=>$password])->get();
+    if(sizeof($user)>0){
+        $response->getBody()->write(json_encode($user));
+    }else{
+        $response->getBody()->write("No Result Found");
+    }
+});
+$app->post('/restaurant/login',function($request,$response){
+    new Database("dbrestaurant");
+    $apikey = $request->getHeader('APIKEY');
+    new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
+    $username = $request->getParam('username');
+    $password = crypt($request->getParam('password'),CRYPTKEY);
+    $restaurant = Restaurant::where(['USERNAME'=>$username,'PASSWORD'=>$password])->get();
+    if(sizeof($restaurant)>0){
+        $response->getBody()->write(json_encode($restaurant));
+    }else{
+        $response->getBody()->write("No Result Found");
+    }
+});
 $app->run();
