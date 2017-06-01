@@ -12,22 +12,6 @@ use Models\Time_open;
 use Models\User_like;
 use Models\User_rate;
 
-function rad($x){
-    return $x * (3.14) / 180;
-}
-
-function haversine($p1,$p2){
-    $r = 6378137;
-    $dLat = rad($p2['latitude'] - $p1['latitude']);
-    $dLong = rad($p2['longitude'] - $p1['longitude']);
-    $a = Math.sin($dLat/2)*Math.sin($dLat/2)+Math.cos(rad($p1['latitude'])) * Math.cos(rad($p2['latitude'])) *
-        Math.sin(dLong / 2) * Math.sin(dLong / 2);
-    $c = 2 * Math.atan2(Math.sqrt($a),Math.sqrt(1-$a));
-    return $r*$c;
-}
-
-
-
 $app = new \Slim\App;
 
 $app->get('/company', function($request, $response) {
@@ -51,7 +35,7 @@ $app->post('/company/register',function($request,$response){
     "ADDRESS"  => $request->getParam("ADDRESS"),
     "PHONE" => $request->getParam("PHONE"),
     "USERNAME"  => $request->getParam("USERNAME"),
-    "PASSWORD" => crypt($request->getParam("PASSWORD"),CRYPTKEY),
+    "PASSWORD" => $request->getParam("PASSWORD"),
     "APIKEY" => md5($request->getParam("USERNAME").$request->getParam("PASSWORD"))
   ];
   $company = Company::create($newCompany);
@@ -149,81 +133,4 @@ $app->put('/restaurant/update/{id}', function($request,$response){
   }
 });
 
-//effendy
-
-$app->get('/restaurant/findRestaurant',function($request,$response){
-    new Database("dbrestaurant");
-    $apikey = $request->getHeader('APIKEY');
-    new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
-    $getArray = $request->getParams();
-    $whereArray = array();
-    $restaurant = Restaurant::where('1','=','1');
-    if(array_key_exists('name',$getArray)){
-        $name = $getArray['name'];
-        $restaurant = $restaurant->where(['NAME'=>$name]);
-    }
-    if(array_key_exists('latitude',$getArray)){
-        $latitude = $getArray['latitude'];
-        $restaurant = $restaurant->where(['LATITUDE'=>$latitude]);
-    }
-    if(array_key_exists('longitude',$getArray)){
-        $longitude = $getArray['longitude'];
-        $restaurant = $restaurant->where(['LONGITUDE'=>$longitude]);
-    }
-    $response->getBody()->write(json_encode($restaurant));
-    /*
-    if(array_key_exists('latitudeHere',$getArray) && array_key_exists('longitudeHere',$getArray) && array_key_exists('isNearby',$getArray)){
-        $latitudeHere = $getArray['latitudeHere'];
-        $longitudeHere = $getArray['longitudeHere'];
-        $isNearby = $getArray['isNearby'];
-        if($isNearby == 1){
-
-        }
-    }
-    if(array_key_exists('time_now',$getArray)){
-        $time_now = $getArray['time_now'];
-    }
-    if(array_key_exists('isOpen',$getArray)){
-        $isOpen = $getArray['isOpen'];
-    }
-
-    */
-
-    //engkok ae sek
-
-
-});
-
-$app->get('/restaurant/findByMenu/{menuName}/{minimum_price}/{maximum_price}/{time_now}/{isOpen}',function($request,$response){
-    new Database("dbrestaurant");
-    $apikey = $request->getHeader('APIKEY');
-    new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
-});
-
-$app->post('/user/login',function($request,$response){
-    new Database("dbrestaurant");
-    $apikey = $request->getHeader('APIKEY');
-    new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
-    $username = $request->getParam('username');
-    $password = crypt($request->getParam('password'),CRYPTKEY);
-    $user = User::where(['USERNAME'=>$username,'PASSWORD'=>$password])->get();
-    if(sizeof($user)>0){
-        $response->getBody()->write(json_encode($user));
-    }else{
-        $response->getBody()->write("No Result Found");
-    }
-});
-$app->post('/restaurant/login',function($request,$response){
-    new Database("dbrestaurant");
-    $apikey = $request->getHeader('APIKEY');
-    new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
-    $username = $request->getParam('username');
-    $password = crypt($request->getParam('password'),CRYPTKEY);
-    $restaurant = Restaurant::where(['USERNAME'=>$username,'PASSWORD'=>$password])->get();
-    if(sizeof($restaurant)>0){
-        $response->getBody()->write(json_encode($restaurant));
-    }else{
-        $response->getBody()->write("No Result Found");
-    }
-});
 $app->run();
