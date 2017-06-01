@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.6.5.2
--- https://www.phpmyadmin.net/
+-- version 4.5.1
+-- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: May 30, 2017 at 05:35 PM
--- Server version: 10.1.21-MariaDB
--- PHP Version: 5.6.30
+-- Generation Time: Jun 01, 2017 at 12:57 PM
+-- Server version: 10.1.10-MariaDB
+-- PHP Version: 5.6.19
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -17,7 +17,6 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `dbrestaurant_gojek`
 --
 
 -- --------------------------------------------------------
@@ -106,19 +105,6 @@ CREATE TABLE `user` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `user_like`
---
-
-DROP TABLE IF EXISTS `user_like`;
-CREATE TABLE `user_like` (
-  `USER_NO` int(11) NOT NULL,
-  `MENU_NO` int(11) NOT NULL,
-  `LIKE_DISLIKE` tinyint(1) NOT NULL DEFAULT '1' COMMENT '1 = LIKE, 0 = DISLIKE'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `user_rate`
 --
 
@@ -160,13 +146,6 @@ ALTER TABLE `user`
   ADD PRIMARY KEY (`NO`);
 
 --
--- Indexes for table `user_like`
---
-ALTER TABLE `user_like`
-  ADD KEY `USER_LIKE_MENU_NO` (`MENU_NO`),
-  ADD KEY `USER_LIKE_USER_NO` (`USER_NO`);
-
---
 -- Indexes for table `user_rate`
 --
 ALTER TABLE `user_rate`
@@ -181,22 +160,22 @@ ALTER TABLE `user_rate`
 -- AUTO_INCREMENT for table `menu`
 --
 ALTER TABLE `menu`
-  MODIFY `NO` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `NO` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT for table `restaurant`
 --
 ALTER TABLE `restaurant`
-  MODIFY `NO` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `NO` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 --
 -- AUTO_INCREMENT for table `time_open`
 --
 ALTER TABLE `time_open`
-  MODIFY `NO` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `NO` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `NO` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `NO` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
 -- Constraints for dumped tables
 --
@@ -212,13 +191,6 @@ ALTER TABLE `menu`
 --
 ALTER TABLE `restaurant`
   ADD CONSTRAINT `RESTAURANT_TIME_OPEN_NO` FOREIGN KEY (`TIME_OPEN`) REFERENCES `time_open` (`NO`);
-
---
--- Constraints for table `user_like`
---
-ALTER TABLE `user_like`
-  ADD CONSTRAINT `USER_LIKE_MENU_NO` FOREIGN KEY (`MENU_NO`) REFERENCES `menu` (`NO`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `USER_LIKE_USER_NO` FOREIGN KEY (`USER_NO`) REFERENCES `user` (`NO`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `user_rate`

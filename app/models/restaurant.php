@@ -21,6 +21,18 @@ class Restaurant extends Model {
     {
       return $this->hasMany('Models\Menu', 'RESTAURANT_NO', 'NO');
     }
+
+    public function user_rate()
+    {
+      return $this->hasMany('Models\User_rate', 'RESTAURANT_NO', 'NO');
+    }
+
+    public function getRating()
+    {
+      return $this->user_rate->avg(function($user_rate) {
+        return $user_rate->RATE;
+      });
+    }
 }
 
 ?>

@@ -37,6 +37,25 @@ $app->get('/restaurant/{id}', function($request, $response) {
   return $response;
 });
 
+$app->get('/restaurant/rating/{id}', function($request, $response) {
+  new Database("dbrestaurant");
+  $apikey = $request->getHeader('APIKEY');
+  new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
+  $id = $request->getAttribute('id');
+  $restaurant_rate = Restaurant::where(["NO" => $id])->first()->getRating();
+  $response->getBody()->write(json_encode(["Rating" => $restaurant_rate]));
+  return $response;
+});
+
+$app->get('/user/{id}', function($request, $response) {
+  new Database("dbrestaurant");
+  $apikey = $request->getHeader('APIKEY');
+  new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
+  $id = $request->getAttribute('id');
+  $response->getBody()->write(json_encode(User::where(["NO"=>$id])->get()));
+  return $response;
+});
+
 $app->get('/user', function($request, $response) {
   new Database("dbrestaurant");
   $apikey = $request->getHeader('APIKEY');
@@ -60,7 +79,7 @@ $app->post('/company/register',function($request,$response){
     "ADDRESS"  => $request->getParam("ADDRESS"),
     "PHONE" => $request->getParam("PHONE"),
     "USERNAME"  => $request->getParam("USERNAME"),
-    "PASSWORD" => MD5($request->getParam("PASSWORD")),
+    "PASSWORD" => crypt($request->getParam("PASSWORD"),CRYPTKEY),
     "APIKEY" => md5($request->getParam("USERNAME").$request->getParam("PASSWORD"))
   ];
   $company = Company::create($newCompany);
@@ -102,7 +121,7 @@ $app->post('/restaurant/register', function($request,$response){
       'LONGITUDE' => $request->getParam('LONGITUDE'),
       'BIO' => $request->getParam('BIO'),
       'USERNAME' => $request->getParam('USERNAME'),
-      'PASSWORD' => MD5($request->getParam('PASSWORD')),
+      'PASSWORD' => crypt($request->getParam('PASSWORD'),CRYPTKEY),
       'STATUS' => $request->getParam('STATUS')
     ];
     $restaurant  = Restaurant::create($newRestaurant);
@@ -130,7 +149,7 @@ $app->put('/restaurant/update/{id}', function($request,$response){
       'LONGITUDE' => $request->getParam('LONGITUDE'),
       'BIO' => $request->getParam('BIO'),
       'USERNAME' => $request->getParam('USERNAME'),
-      'PASSWORD' => MD5($request->getParam('PASSWORD')),
+      'PASSWORD' => crypt($request->getParam('PASSWORD'),CRYPTKEY),
       'STATUS' => $request->getParam('STATUS')
     ];
     Restaurant::where(['NO'=>$id])->update($newRestaurant);
@@ -176,7 +195,7 @@ $app->post('/user/register', function($request,$response){
       'EMAIL' => $request->getParam('EMAIL'),
       'GENDER' => $request->getParam('GENDER'),
       'USERNAME' => $request->getParam('USERNAME'),
-      'PASSWORD' => MD5($request->getParam('PASSWORD')),
+      'PASSWORD' => crypt($request->getParam('PASSWORD'),CRYPTKEY),
       'STATUS' => $request->getParam('STATUS')
     ];
     $user = User::create($newUser);
@@ -226,7 +245,7 @@ $app->put('/user/update/{id}', function($request,$response){
     }
     if(!($request->getParam('PASSWORD')===null))
     {
-      $myArray += ['PASSWORD' => MD5($request->getParam('PASSWORD'))];
+      $myArray += ['PASSWORD' => crypt($request->getParam('PASSWORD'),CRYPTKEY)];
     }
     if(!($request->getParam('STATUS')===null))
     {
@@ -301,6 +320,32 @@ $app->delete('/menu/delete/{id}', function($request,$response){
     new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
     $id = $request->getAttribute('id');
     Menu::where(['NO'=>$id])->delete();
+    $response->getBody()->write(json_encode(["success"=>true]));
+    return $response;
+  } catch (Exception $e) {
+    $response->getBody()->write(json_encode(["success"=>false, "error"=>$e]));
+    return $response;
+  }
+});
+
+$app->post('/rate', function($request,$response){
+  try {
+    new Database("dbrestaurant");
+    $apikey = $request->getHeader('APIKEY');
+    new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
+    $myArray = [
+      "USER_NO" => $request->getParam("USER_NO"),
+      "RESTAURANT_NO" => $request->getParam("RESTAURANT_NO")
+    ];
+    $user_rate = User_rate::where($myArray)->first();
+    if($user_rate===null)
+    {
+      $myArray += ["RATE" => $request->getParam("RATE")];
+      User_rate::create($myArray);
+    }
+    else {
+      User_rate::where($myArray)->update(["RATE" => $request->getParam("RATE")]);
+    }
     $response->getBody()->write(json_encode(["success"=>true]));
     return $response;
   } catch (Exception $e) {

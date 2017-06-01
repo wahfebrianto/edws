@@ -19,5 +19,10 @@ class User extends Model {
       'PASSWORD',
       'STATUS'
     ];
+
+    public function user_rate()
+    {
+      return $this->hasMany('Models\User_rate', 'USER_NO', 'NO');
+    }
 }
 ?>
