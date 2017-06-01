@@ -24,7 +24,32 @@ $app->get('/restaurant', function($request, $response) {
   new Database("dbrestaurant");
   $apikey = $request->getHeader('APIKEY');
   new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
-  $response->getBody()->write(json_encode(Restaurant::with("time_open")->get()));
+  $response->getBody()->write(json_encode(Restaurant::with("time_open")->with("menu")->get()));
+  return $response;
+});
+
+$app->get('/restaurant/{id}', function($request, $response) {
+  new Database("dbrestaurant");
+  $apikey = $request->getHeader('APIKEY');
+  new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
+  $id = $request->getAttribute('id');
+  $response->getBody()->write(json_encode(Restaurant::with("time_open")->with("menu")->where(["NO"=>$id])->get()));
+  return $response;
+});
+
+$app->get('/user', function($request, $response) {
+  new Database("dbrestaurant");
+  $apikey = $request->getHeader('APIKEY');
+  new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
+  $response->getBody()->write(json_encode(User::get()));
+  return $response;
+});
+
+$app->get('/menu', function($request, $response) {
+  new Database("dbrestaurant");
+  $apikey = $request->getHeader('APIKEY');
+  new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
+  $response->getBody()->write(json_encode(Menu::with("restaurant")->get()));
   return $response;
 });
 
@@ -35,7 +60,7 @@ $app->post('/company/register',function($request,$response){
     "ADDRESS"  => $request->getParam("ADDRESS"),
     "PHONE" => $request->getParam("PHONE"),
     "USERNAME"  => $request->getParam("USERNAME"),
-    "PASSWORD" => $request->getParam("PASSWORD"),
+    "PASSWORD" => MD5($request->getParam("PASSWORD")),
     "APIKEY" => md5($request->getParam("USERNAME").$request->getParam("PASSWORD"))
   ];
   $company = Company::create($newCompany);
@@ -47,7 +72,6 @@ $app->post('/restaurant/register', function($request,$response){
     new Database("dbrestaurant");
     $apikey = $request->getHeader('APIKEY');
     new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
-
     //insert timeopen sek an
     //generate semua timeopen 1 minggu
     $myArray = [
@@ -78,12 +102,15 @@ $app->post('/restaurant/register', function($request,$response){
       'LONGITUDE' => $request->getParam('LONGITUDE'),
       'BIO' => $request->getParam('BIO'),
       'USERNAME' => $request->getParam('USERNAME'),
-      'PASSWORD' => $request->getParam('PASSWORD'),
-      'STATUS' => 1
+      'PASSWORD' => MD5($request->getParam('PASSWORD')),
+      'STATUS' => $request->getParam('STATUS')
     ];
     $restaurant  = Restaurant::create($newRestaurant);
+    $response->getBody()->write(json_encode(["success"=>true]));
+    return $response;
   } catch (Exception $e) {
-    echo "Error : ".$e;
+    $response->getBody()->write(json_encode(["success"=>false, "error"=>$e]));
+    return $response;
   }
 });
 
@@ -103,8 +130,8 @@ $app->put('/restaurant/update/{id}', function($request,$response){
       'LONGITUDE' => $request->getParam('LONGITUDE'),
       'BIO' => $request->getParam('BIO'),
       'USERNAME' => $request->getParam('USERNAME'),
-      'PASSWORD' => $request->getParam('PASSWORD'),
-      'STATUS' => 1
+      'PASSWORD' => MD5($request->getParam('PASSWORD')),
+      'STATUS' => $request->getParam('STATUS')
     ];
     Restaurant::where(['NO'=>$id])->update($newRestaurant);
     $restaurant = Restaurant::where(['NO'=>$id])->first();
@@ -128,8 +155,157 @@ $app->put('/restaurant/update/{id}', function($request,$response){
     ];
     Time_open::where(['NO'=>$restaurant->TIME_OPEN])->update($myArray);
     //timeopen selesai
+    $response->getBody()->write(json_encode(["success"=>true]));
+    return $response;
   } catch (Exception $e) {
-    echo "Error : ".$e;
+    $response->getBody()->write(json_encode(["success"=>false, "error"=>$e]));
+    return $response;
+  }
+});
+
+$app->post('/user/register', function($request,$response){
+  try {
+    new Database("dbrestaurant");
+    $apikey = $request->getHeader('APIKEY');
+    new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
+    $newUser = [
+      'NAME' => $request->getParam('NAME'),
+      'ADDRESS' => $request->getParam('ADDRESS'),
+      'PHONE' => $request->getParam('PHONE'),
+      'DOB' => $request->getParam('DOB'),
+      'EMAIL' => $request->getParam('EMAIL'),
+      'GENDER' => $request->getParam('GENDER'),
+      'USERNAME' => $request->getParam('USERNAME'),
+      'PASSWORD' => MD5($request->getParam('PASSWORD')),
+      'STATUS' => $request->getParam('STATUS')
+    ];
+    $user = User::create($newUser);
+    $response->getBody()->write(json_encode(["success"=>true]));
+    return $response;
+  } catch (Exception $e) {
+    $response->getBody()->write(json_encode(["success"=>false, "error"=>$e]));
+    return $response;
+  }
+});
+
+$app->put('/user/update/{id}', function($request,$response){
+  try {
+    new Database("dbrestaurant");
+    $apikey = $request->getHeader('APIKEY');
+    new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
+    $id = $request->getAttribute('id');
+
+    $myArray = [];
+    if(!($request->getParam('NAME')===null))
+    {
+      $myArray += ['NAME' => $request->getParam('NAME')];
+    }
+    if(!($request->getParam('ADDRESS')===null))
+    {
+      $myArray += ['ADDRESS' => $request->getParam('ADDRESS')];
+    }
+    if(!($request->getParam('PHONE')===null))
+    {
+      $myArray += ['PHONE' => $request->getParam('PHONE')];
+    }
+    if(!($request->getParam('DOB')===null))
+    {
+      $myArray += ['DOB' => $request->getParam('DOB')];
+    }
+    if(!($request->getParam('EMAIL')===null))
+    {
+      $myArray += ['EMAIL' => $request->getParam('EMAIL')];
+    }
+    if(!($request->getParam('GENDER')===null))
+    {
+      $myArray += ['GENDER' => $request->getParam('GENDER')];
+    }
+    if(!($request->getParam('USERNAME')===null))
+    {
+      $myArray += ['USERNAME' => $request->getParam('USERNAME')];
+    }
+    if(!($request->getParam('PASSWORD')===null))
+    {
+      $myArray += ['PASSWORD' => MD5($request->getParam('PASSWORD'))];
+    }
+    if(!($request->getParam('STATUS')===null))
+    {
+      $myArray += ['STATUS' => $request->getParam('STATUS')];
+    }
+    User::where(['NO'=>$id])->update($myArray);
+    $response->getBody()->write(json_encode(["success"=>true]));
+    return $response;
+  } catch (Exception $e) {
+    $response->getBody()->write(json_encode(["success"=>false, "error"=>$e]));
+    return $response;
+  }
+});
+
+$app->post('/menu/register', function($request,$response){
+  try {
+    new Database("dbrestaurant");
+    $apikey = $request->getHeader('APIKEY');
+    new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
+    $newMenu = [
+      'NAME' => $request->getParam('NAME'),
+      'PRICE' => $request->getParam('PRICE'),
+      'RECOMMENDED' => $request->getParam('RECOMMENDED'),
+      'NOTE' => $request->getParam('NOTE'),
+      'RESTAURANT_NO' => $request->getParam('RESTAURANT_NO')
+    ];
+    $menu = Menu::create($newMenu);
+    $response->getBody()->write(json_encode(["success"=>true]));
+    return $response;
+  } catch (Exception $e) {
+    $response->getBody()->write(json_encode(["success"=>false, "error"=>$e]));
+    return $response;
+  }
+});
+
+$app->put('/menu/update/{id}', function($request,$response){
+  try {
+    new Database("dbrestaurant");
+    $apikey = $request->getHeader('APIKEY');
+    new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
+    $id = $request->getAttribute('id');
+    $myArray = [];
+    if(!($request->getParam('NAME')===null))
+    {
+      $myArray += ['NAME' => $request->getParam('NAME')];
+    }
+    if(!($request->getParam('PRICE')===null))
+    {
+      $myArray += ['PRICE' => $request->getParam('PRICE')];
+    }
+    if(!($request->getParam('RECOMMENDED')===null))
+    {
+      $myArray += ['RECOMMENDED' => $request->getParam('RECOMMENDED')];
+    }
+    if(!($request->getParam('NOTE')===null))
+    {
+      $myArray += ['NOTE' => $request->getParam('NOTE')];
+    }
+    Menu::where(['NO'=>$id])->update($myArray);
+    $response->getBody()->write(json_encode(["success"=>true]));
+    return $response;
+  } catch (Exception $e) {
+    $response->getBody()->write(json_encode(["success"=>false, "error"=>$e]));
+    return $response;
+  }
+});
+
+$app->delete('/menu/delete/{id}', function($request,$response){
+  try {
+    new Database("dbrestaurant");
+    $apikey = $request->getHeader('APIKEY');
+    new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
+    $id = $request->getAttribute('id');
+    Menu::where(['NO'=>$id])->delete();
+    $response->getBody()->write(json_encode(["success"=>true]));
+    return $response;
+  } catch (Exception $e) {
+    $response->getBody()->write(json_encode(["success"=>false, "error"=>$e]));
+    return $response;
   }
 });
 
