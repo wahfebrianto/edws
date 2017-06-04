@@ -12,15 +12,32 @@ use Models\Time_open;
 use Models\User_like;
 use Models\User_rate;
 
+function rad($x){
+    return $x * (3.14) / 180;
+}
+
+function haversine($p1,$p2){
+    $r = 6378137;
+    $dLat = rad($p2['latitude'] - $p1['latitude']);
+    $dLong = rad($p2['longitude'] - $p1['longitude']);
+    $a = sin($dLat/2)*sin($dLat/2)+cos(rad($p1['latitude'])) * cos(rad($p2['latitude'])) *
+        sin($dLong / 2) * sin($dLong / 2);
+    $c = 2 * atan2(sqrt($a),sqrt(1-$a));
+    if( $r*$c < 5000){
+		return true;
+	}
+	return false;
+}
+
 $app = new \Slim\App;
 
-$app->get('/company', function($request, $response) {
+$app->get('/company/findAll', function($request, $response) {
   new Database("dbrestaurant");
   $response->getBody()->write(json_encode(Company::all()));
   return $response;
 });
 
-$app->get('/restaurant', function($request, $response) {
+$app->get('/restaurant/findAll', function($request, $response) {
   new Database("dbrestaurant");
   $apikey = $request->getHeader('APIKEY');
   new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
@@ -28,7 +45,7 @@ $app->get('/restaurant', function($request, $response) {
   return $response;
 });
 
-$app->get('/restaurant/{id}', function($request, $response) {
+$app->get('/restaurant/findById/{id}', function($request, $response) {
   new Database("dbrestaurant");
   $apikey = $request->getHeader('APIKEY');
   new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
@@ -47,7 +64,7 @@ $app->get('/restaurant/rating/{id}', function($request, $response) {
   return $response;
 });
 
-$app->get('/user/{id}', function($request, $response) {
+$app->get('/user/findById/{id}', function($request, $response) {
   new Database("dbrestaurant");
   $apikey = $request->getHeader('APIKEY');
   new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
@@ -56,7 +73,7 @@ $app->get('/user/{id}', function($request, $response) {
   return $response;
 });
 
-$app->get('/user', function($request, $response) {
+$app->get('/user/findAll', function($request, $response) {
   new Database("dbrestaurant");
   $apikey = $request->getHeader('APIKEY');
   new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
@@ -64,7 +81,7 @@ $app->get('/user', function($request, $response) {
   return $response;
 });
 
-$app->get('/menu', function($request, $response) {
+$app->get('/menu/findAll', function($request, $response) {
   new Database("dbrestaurant");
   $apikey = $request->getHeader('APIKEY');
   new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
@@ -327,12 +344,7 @@ $app->delete('/menu/delete/{id}', function($request,$response){
     return $response;
   }
 });
-//effendy
-function rad($x){
-    return $x * (3.14) / 180;
-}
 
-<<<<<<< HEAD
 $app->post('/rate', function($request,$response){
   try {
     new Database("dbrestaurant");
@@ -358,17 +370,6 @@ $app->post('/rate', function($request,$response){
     return $response;
   }
 });
-
-=======
-function haversine($p1,$p2){
-    $r = 6378137;
-    $dLat = rad($p2['latitude'] - $p1['latitude']);
-    $dLong = rad($p2['longitude'] - $p1['longitude']);
-    $a = Math.sin($dLat/2)*Math.sin($dLat/2)+Math.cos(rad($p1['latitude'])) * Math.cos(rad($p2['latitude'])) *
-        Math.sin(dLong / 2) * Math.sin(dLong / 2);
-    $c = 2 * Math.atan2(Math.sqrt($a),Math.sqrt(1-$a));
-    return $r*$c;
-}
 
 $app->post('/user/login',function($request,$response){
     new Database("dbrestaurant");
@@ -396,5 +397,82 @@ $app->post('/restaurant/login',function($request,$response){
         $response->getBody()->write("No Result Found");
     }
 });
->>>>>>> origin/master
+
+
+$app->get('/restaurant/findRestaurant',function($request,$response){
+	new Database("dbrestaurant");
+    $apikey = $request->getHeader('APIKEY');
+    new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
+    $getArray = $request->getParams();
+    $restaurant = Restaurant::where('NAME','LIKE','%%');
+    if(array_key_exists('name',$getArray)){
+        $name = $getArray['name'];
+        $restaurant = $restaurant->where('NAME','LIKE','%'.$name.'%');
+    }
+    if(array_key_exists('latitude',$getArray)){
+        $latitude = $getArray['latitude'];
+        $restaurant = $restaurant->where('LATITUDE',$latitude);
+    }
+    if(array_key_exists('longitude',$getArray)){
+        $longitude = $getArray['longitude'];
+        $restaurant = $restaurant->where('LONGITUDE',$longitude);
+    }
+	if(array_key_exists('time_now',$getArray) && array_key_exists('day',$getArray)){
+		//time_now format hh:mm:ss
+		$restaurant = $restaurant->join('time_open','time_open.NO','=','restaurant.TIME_OPEN')->where('TIME_OPEN_'.strtoupper($getArray['day']),'<=',$getArray['time_now'])->where('TIME_CLOSE_'.strtoupper($getArray['day']),'>=',$getArray['time_now']);
+	}
+    $response->getBody()->write(json_encode($restaurant->get()));
+});
+$app->get('/restaurant/findNearbyRestaurant',function($request,$response){
+	try{
+		$getArray = $request->getParams();
+		if(array_key_exists('latitudeHere',$getArray) && array_key_exists('longitudeHere',$getArray)){
+			//time_now format hh:mm:ss
+			new Database("dbrestaurant");
+			$apikey = $request->getHeader('APIKEY');
+			new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
+			$latHere = $getArray['latitudeHere'];
+			$longHere = $getArray['longitudeHere'];
+			$restaurant  = Restaurant::all()->filter(function($event) use ($getArray){
+				$napp = array();
+				$napp['latitude'] = $event->LATITUDE;
+				$napp['longitude'] = $event->LONGITUDE;
+				$mapp = array();
+				$mapp['latitude'] = $getArray['latitudeHere'];
+				$mapp['longitude'] = $getArray['longitudeHere'];
+				return haversine($napp,$mapp);
+			});
+			$response->getBody()->write($restaurant);
+		}
+		else{
+			$response->getBody()->write("Parameters not valid");
+		}
+	}
+	catch(Exception $e){
+		$response->getBody()->write($e);
+	}
+});
+
+$app->get('/restaurant/findByMenu',function($request,$response){
+	
+	$getArray = $request->getParams();
+	new Database("dbrestaurant");
+	$apikey = $request->getHeader('APIKEY');
+	new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
+	$menu = Menu::where('NAME','LIKE','%%');
+	$restaurant = Restaurant::where('NAME','LIKE','%%');
+	if(array_key_exists('menuName',$getArray)){
+		$restaurant = $restaurant->whereIn('NO', function($query) use ($getArray){
+			$query->select('RESTAURANT_NO')->from('menu')->where('NAME','LIKE','%'.$getArray['menuName'].'%');
+		});
+	}
+	if(array_key_exists('minPrice',$getArray) && array_key_exists('maxPrice',$getArray)){
+		$restaurant = $restaurant->whereIn('NO', function($query) use ($getArray){
+			$query->select('RESTAURANT_NO')->from('menu')->where('price','<=',$getArray['maxPrice'])->where('price','>=',$getArray['minPrice']);
+		});
+	}
+	echo json_encode($restaurant->with('menu')->get());
+});
+
+
 $app->run();
