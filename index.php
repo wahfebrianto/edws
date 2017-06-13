@@ -156,40 +156,57 @@ $app->put('/restaurant/update/{id}', function($request,$response){
     $apikey = $request->getHeader('APIKEY');
     new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
     $id = $request->getAttribute('id');
-
-    $newRestaurant = [
-      'NAME' => $request->getParam('NAME'),
-      'ADDRESS' => $request->getParam('ADDRESS'),
-      'PHONE' => $request->getParam('PHONE'),
-      'EMAIL' => $request->getParam('EMAIL'),
-      'LATITUDE' => $request->getParam('LATITUDE'),
-      'LONGITUDE' => $request->getParam('LONGITUDE'),
-      'BIO' => $request->getParam('BIO'),
-      'USERNAME' => $request->getParam('USERNAME'),
-      'PASSWORD' => crypt($request->getParam('PASSWORD'),CRYPTKEY),
-      'STATUS' => $request->getParam('STATUS')
-    ];
-    Restaurant::where(['NO'=>$id])->update($newRestaurant);
+	$myArray = $request->getParams();
+	$keyCollection = array_keys($myArray);
+	$fieldList = [
+		"NAME"=>'1',
+		"ADDRESS"=>'1',
+		"PHONE"=>'1',
+		"EMAIL"=>'1',
+		"TIME_OPEN"=>'1',
+		"LATITUDE"=>'1',
+		"LONGITUDE"=>'1',
+		"BIO"=>'1',
+		"USERNAME"=>'1',
+		"PASSWORD"=>'1',
+		"STATUS"=>'1'
+	];
+	$fieldListTime = [
+		"TIME_OPEN_MONDAY" => "1",
+		"TIME_OPEN_TUESDAY" => "1",
+		"TIME_OPEN_WEDNESDAY" => "1",
+		"TIME_OPEN_THURSDAY" => "1",
+		"TIME_OPEN_FRIDAY" => "1",
+		"TIME_OPEN_SATURDAY" => "1",
+		"TIME_OPEN_SUNDAY" => "1",
+		"TIME_CLOSE_MONDAY" => "1",
+		"TIME_CLOSE_TUESDAY" => "1",
+		"TIME_CLOSE_WEDNESDAY" => "1",
+		"TIME_CLOSE_THURSDAY" => "1",
+		"TIME_CLOSE_FRIDAY" => "1",
+		"TIME_CLOSE_SATURDAY" => "1",
+		"TIME_CLOSE_SUNDAY" => "1"
+	];
+	$newRestaurant = array();
+	for($i=0;$i<sizeof($keyCollection);$i++){
+		if(array_key_exists($keyCollection[$i],$myArray) && array_key_exists($keyCollection[$i],$fieldList)){
+			echo strpos($keyCollection[$i],'TIME_');
+			$newRestaurant[$keyCollection[$i]] = $myArray[$keyCollection[$i]];
+		}
+	}
+	if(sizeof($newRestaurant)>0){
+		Restaurant::where(['NO'=>$id])->update($newRestaurant);
+	}
     $restaurant = Restaurant::where(['NO'=>$id])->first();
-    //insert timeopen sek an
-    //generate semua timeopen 1 minggu
-    $myArray = [
-      'TIME_OPEN_MONDAY'=> $request->getParam("TIME_OPEN_MONDAY"),
-      'TIME_CLOSE_MONDAY'=> $request->getParam("TIME_CLOSE_MONDAY"),
-      'TIME_OPEN_TUESDAY'=> $request->getParam("TIME_OPEN_TUESDAY"),
-      'TIME_CLOSE_TUESDAY'=> $request->getParam("TIME_CLOSE_TUESDAY"),
-      'TIME_OPEN_WEDNESDAY'=> $request->getParam("TIME_OPEN_WEDNESDAY"),
-      'TIME_CLOSE_WEDNESDAY'=> $request->getParam("TIME_CLOSE_WEDNESDAY"),
-      'TIME_OPEN_THURSDAY'=> $request->getParam("TIME_OPEN_THURSDAY"),
-      'TIME_CLOSE_THURSDAY'=> $request->getParam("TIME_CLOSE_THURSDAY"),
-      'TIME_OPEN_FRIDAY'=> $request->getParam("TIME_OPEN_FRIDAY"),
-      'TIME_CLOSE_FRIDAY'=> $request->getParam("TIME_CLOSE_FRIDAY"),
-      'TIME_OPEN_SATURDAY'=> $request->getParam("TIME_OPEN_SATURDAY"),
-      'TIME_CLOSE_SATURDAY'=> $request->getParam("TIME_CLOSE_SATURDAY"),
-      'TIME_OPEN_SUNDAY'=> $request->getParam("TIME_OPEN_SUNDAY"),
-      'TIME_CLOSE_SUNDAY'=> $request->getParam("TIME_CLOSE_SUNDAY")
-    ];
-    Time_open::where(['NO'=>$restaurant->TIME_OPEN])->update($myArray);
+	$myArray1 = array();
+	for($i=0;$i<sizeof($keyCollection);$i++){
+		if(array_key_exists($keyCollection[$i],$myArray) && array_key_exists($keyCollection[$i],$fieldListTime)){
+			$myArray1[$keyCollection[$i]] = $myArray[$keyCollection[$i]];
+		}
+	}
+	if(sizeof($myArray1) > 0){
+		Time_open::where(['NO'=>$restaurant->TIME_OPEN])->update($myArray1);
+	}
     //timeopen selesai
     $response->getBody()->write(json_encode(["success"=>true]));
     return $response;
