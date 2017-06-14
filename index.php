@@ -50,7 +50,8 @@ $app->get('/restaurant/findById/{id}', function($request, $response) {
   $apikey = $request->getHeader('APIKEY');
   new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
   $id = $request->getAttribute('id');
-  $response->getBody()->write(json_encode(Restaurant::with("time_open")->with("menu")->where(["NO"=>$id])->get()));
+  $restaurant["result"] = Restaurant::with("time_open")->with("menu")->where(["NO"=>$id])->first();
+  $response->getBody()->write(json_encode($restaurant));
   return $response;
 });
 
@@ -407,7 +408,7 @@ $app->post('/restaurant/login',function($request,$response){
     new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
     $username = $request->getParam('username');
     $password = crypt($request->getParam('password'),CRYPTKEY);
-    $restaurant = Restaurant::where(['USERNAME'=>$username,'PASSWORD'=>$password])->get();
+    $restaurant["result"] = Restaurant::where(['USERNAME'=>$username,'PASSWORD'=>$password])->first();
     if(sizeof($restaurant)>0){
         $response->getBody()->write(json_encode($restaurant));
     }else{
