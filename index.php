@@ -41,7 +41,8 @@ $app->get('/restaurant/findAll', function($request, $response) {
   new Database("dbrestaurant");
   $apikey = $request->getHeader('APIKEY');
   new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
-  $response->getBody()->write(json_encode(Restaurant::with("time_open")->with("menu")->get()));
+  $restaurant["result"] = Restaurant::with("time_open")->with("menu")->get();
+  $response->getBody()->write(json_encode($restaurant));
   return $response;
 });
 
@@ -61,7 +62,7 @@ $app->get('/restaurant/rating/{id}', function($request, $response) {
   new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
   $id = $request->getAttribute('id');
   $restaurant_rate = Restaurant::where(["NO" => $id])->first()->getRating();
-  $response->getBody()->write(json_encode(["Rating" => $restaurant_rate]));
+  $response->getBody()->write(json_encode(["Rating" => (($restaurant_rate==null)?0:$restaurant_rate)]));
   return $response;
 });
 
@@ -70,7 +71,7 @@ $app->get('/user/findById/{id}', function($request, $response) {
   $apikey = $request->getHeader('APIKEY');
   new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
   $id = $request->getAttribute('id');
-  $response->getBody()->write(json_encode(User::where(["NO"=>$id])->get()));
+  $response->getBody()->write(json_encode(["result"=>User::where(["NO"=>$id])->first()]));
   return $response;
 });
 
@@ -193,6 +194,9 @@ $app->put('/restaurant/update/{id}', function($request,$response){
 		if(array_key_exists($keyCollection[$i],$myArray) && array_key_exists($keyCollection[$i],$fieldList)){
 			echo strpos($keyCollection[$i],'TIME_');
 			$newRestaurant[$keyCollection[$i]] = $myArray[$keyCollection[$i]];
+			if($keyCollection[$i] == "PASSWORD"){
+				$newRestaurant[$keyCollection[$i]] = crypt($myArray[$keyCollection[$i]],CRYPTKEY);
+			}
 		}
 	}
 	if(sizeof($newRestaurant)>0){
@@ -347,7 +351,26 @@ $app->put('/menu/update/{id}', function($request,$response){
     return $response;
   }
 });
-
+$app->get('/getrate',function($request,$response){
+  try {
+    new Database("dbrestaurant");
+    $apikey = $request->getHeader('APIKEY');
+    new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
+	$myArray = [
+      "USER_NO" => $request->getParam("USER_NO"),
+      "RESTAURANT_NO" => $request->getParam("RESTAURANT_NO")
+    ];
+	$rate = User_rate::select("rate")->where($myArray)->first()["rate"];
+	if(isset($rate))
+		$response->getBody()->write(json_encode(["result"=>$rate]));
+	else
+		$response->getBody()->write(json_encode(["result"=>0]));
+    return $response;
+  } catch (Exception $e) {
+    $response->getBody()->write(json_encode(["result"=>"error"]));
+    return $response;
+  }
+});
 $app->delete('/menu/delete/{id}', function($request,$response){
   try {
     new Database("dbrestaurant");
@@ -395,7 +418,7 @@ $app->post('/user/login',function($request,$response){
     new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
     $username = $request->getParam('username');
     $password = crypt($request->getParam('password'),CRYPTKEY);
-    $user = User::where(['USERNAME'=>$username,'PASSWORD'=>$password])->get();
+    $user["result"] = User::where(['USERNAME'=>$username,'PASSWORD'=>$password])->first();
     if(sizeof($user)>0){
         $response->getBody()->write(json_encode($user));
     }else{
@@ -451,7 +474,7 @@ $app->get('/restaurant/findNearbyRestaurant',function($request,$response){
 			new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
 			$latHere = $getArray['latitudeHere'];
 			$longHere = $getArray['longitudeHere'];
-			$restaurant  = Restaurant::all()->filter(function($event) use ($getArray){
+			$restaurant["result"]  = Restaurant::all()->filter(function($event) use ($getArray){
 				$napp = array();
 				$napp['latitude'] = $event->LATITUDE;
 				$napp['longitude'] = $event->LONGITUDE;
@@ -460,7 +483,7 @@ $app->get('/restaurant/findNearbyRestaurant',function($request,$response){
 				$mapp['longitude'] = $getArray['longitudeHere'];
 				return haversine($napp,$mapp);
 			});
-			$response->getBody()->write($restaurant);
+			$response->getBody()->write(json_encode($restaurant));
 		}
 		else{
 			$response->getBody()->write("Parameters not valid");
@@ -492,5 +515,26 @@ $app->get('/restaurant/findByMenu',function($request,$response){
 	echo json_encode($restaurant->with('menu')->get());
 });
 
+$app->get('/promo/findAll',function($request,$response){
+	$files["result"] = glob("uploads/promo/*");
+	foreach($files["result"] as $file){
+		$tmp = $file;
+		$stringResult = explode('/',$file);
+		$time = explode("_",$stringResult[2]);
+		$time = explode(".",$time[1]);
+		if($time[0] <= gettimeofday()["sec"]*1000){
+			unlink($file);
+			$file = "";
+			$files["result"] = str_replace($tmp,"",$files["result"]);
+		}
+	}
+	$response->getBody()->write(json_encode($files));
+	return $response;
+});
 
+$app->get('/encrypt/{pass}',function($request,$response){
+	$result["result"] = crypt($request->getAttribute("pass"),CRYPTKEY);
+	$response->getBody()->write(json_encode($result));
+	return $response;
+});
 $app->run();
