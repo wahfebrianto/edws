@@ -7,7 +7,7 @@
 
 	// Echo out a sample image
 	echo '<img src="'.$src.'">';
-	
-	echo crypt("123123","effendydarrenwahyusinarta");
+
+	echo crypt("enak","effendydarrenwahyusinarta");
 
 ?>
