@@ -24,6 +24,13 @@ function createCompany($nama){
 		else{
 			echo "Error creating database: ".mysqli_error();
 		}
+		/*if ($conn->query($sql) === TRUE) {
+			echo "Database created successfully";
+			shell_exec('"C:\xampp\mysql\bin\mysql.exe" -u '.$username.(($password!="")?" -p $password ":' ').$dbname.' < "'.getcwd().'\\'.$sqlfile.'"');
+		} else {
+			echo "Error creating database: " . $conn->error;
+		}*/
 
 		$conn->close();
 }
+createCompany("cobaeffendy");

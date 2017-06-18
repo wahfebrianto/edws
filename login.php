@@ -1,4 +1,5 @@
 <?php
+	session_start();
 	include 'conn.php';
 	include 'api/config.php';
 	$ctr = 0;
@@ -22,7 +23,12 @@
 
 
 		//echo json_encode(json_decode($post_data), JSON_PRETTY_PRINT);
-		echo "NAME : ".$row["NAME"].", ADDRESS : ".$row["ADDRESS"].", PHONE : ".$row["PHONE"].", USERNAME : ".$row["USERNAME"].",  APIKEY : ".$row["APIKEY"]."";
+		$_SESSION['NAME'] = $row['NAME'];
+		$_SESSION['ADDRESS'] = $row['ADDRESS'];
+		$_SESSION['PHONE'] = $row['PHONE'];
+		$_SESSION['USERNAME'] = $row['USERNAME'];
+		$_SESSION['APIKEY'] = $row['APIKEY'];
+		echo "Login Success!";
 	}
 	else
 	{

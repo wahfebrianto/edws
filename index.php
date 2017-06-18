@@ -1,4 +1,5 @@
 <?php
+	session_start();
 	include 'conn.php';
 ?>
 <html lang="en">
@@ -88,7 +89,7 @@
     </header>
 
     <!-- Portfolio Grid Section -->
-    <section id="portfolio" style="background-color:#ECECEA">
+    <section id="portfolio" style="background-color:#ECECEA <?php echo (isset($_SESSION['NAME'])?";display:none":"" ?>">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12 text-center">
