@@ -8,11 +8,11 @@
 	$pass	= $_POST['pass1'];
 
 	$post_data = array(
-		"NAME" => $nama,
-		"ADDRESS" => $email,
-		"PHONE" => $phone,
-		"USERNAME" => $username,
-		"PASSWORD" => $pass
+		"name" => $nama,
+		"address" => $email,
+		"phone" => $phone,
+		"username" => $username,
+		"password" => $pass
 	);
 	$url = 'localhost/edws/api/company/register';
 

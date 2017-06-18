@@ -11,7 +11,7 @@ function ceklogin()
 		}, function(data) {
 			//alert(data);
 			//var temp = data.includes("Data Benar");;
-			if(data != "Data Gagal")
+			if(data != "Username or Password Wrong!")
 			{
 				document.getElementById("username").value = "";
 				document.getElementById("password").value = "";

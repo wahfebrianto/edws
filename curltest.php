@@ -12,7 +12,7 @@
 		curl_setopt($curl,CURLOPT_HTTPGET,TRUE);
 		//curl_setopt($curl,CURLOPT_POSTFIELDS,$post_data);
 		curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-			'APIKEY: 417ebb5ba57f1379ddc9d66311b91278'
+			'apikey: 417ebb5ba57f1379ddc9d66311b91278'
 		));
 		$output = curl_exec($curl);
 		if($output === FALSE)
@@ -37,7 +37,7 @@
 		curl_setopt($curl,CURLOPT_HTTPGET,TRUE);
 		//curl_setopt($curl,CURLOPT_POSTFIELDS,$post_data);
 		curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-			'APIKEY: 417ebb5ba57f1379ddc9d66311b91278'
+			'apikey: 417ebb5ba57f1379ddc9d66311b91278'
 		));
 		$output = curl_exec($curl);
 		if($output === FALSE)
@@ -62,7 +62,7 @@
 		curl_setopt($curl,CURLOPT_HTTPGET,TRUE);
 		//curl_setopt($curl,CURLOPT_POSTFIELDS,$post_data);
 		curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-			'APIKEY: 417ebb5ba57f1379ddc9d66311b91278'
+			'apikey: 417ebb5ba57f1379ddc9d66311b91278'
 		));
 		$output = curl_exec($curl);
 		if($output === FALSE)
@@ -87,7 +87,7 @@
 		curl_setopt($curl,CURLOPT_HTTPGET,TRUE);
 		//curl_setopt($curl,CURLOPT_POSTFIELDS,$post_data);
 		curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-			'APIKEY: 417ebb5ba57f1379ddc9d66311b91278'
+			'apikey: 417ebb5ba57f1379ddc9d66311b91278'
 		));
 		$output = curl_exec($curl);
 		if($output === FALSE)
@@ -111,7 +111,7 @@
 		curl_setopt($curl,CURLOPT_HTTPGET,TRUE);
 		//curl_setopt($curl,CURLOPT_POSTFIELDS,$post_data);
 		curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-			'APIKEY: 417ebb5ba57f1379ddc9d66311b91278'
+			'apikey: 417ebb5ba57f1379ddc9d66311b91278'
 		));
 		$output = curl_exec($curl);
 		if($output === FALSE)
@@ -135,7 +135,7 @@
 		curl_setopt($curl,CURLOPT_HTTPGET,TRUE);
 		//curl_setopt($curl,CURLOPT_POSTFIELDS,$post_data);
 		curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-			'APIKEY: 417ebb5ba57f1379ddc9d66311b91278'
+			'apikey: 417ebb5ba57f1379ddc9d66311b91278'
 		));
 		$output = curl_exec($curl);
 		if($output === FALSE)
@@ -226,7 +226,7 @@
 		curl_setopt($curl,CURLOPT_HTTPGET,TRUE);
 		//curl_setopt($curl,CURLOPT_POSTFIELDS,$post_data);
 		curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-			'APIKEY: 417ebb5ba57f1379ddc9d66311b91278'
+			'apikey: 417ebb5ba57f1379ddc9d66311b91278'
 		));
 		$output = curl_exec($curl);
 		if($output === FALSE)
@@ -266,7 +266,7 @@
 		curl_setopt($curl,CURLOPT_HTTPGET,TRUE);
 		//curl_setopt($curl,CURLOPT_POSTFIELDS,$post_data);
 		curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-			'APIKEY: 417ebb5ba57f1379ddc9d66311b91278'
+			'apikey: 417ebb5ba57f1379ddc9d66311b91278'
 		));
 		$output = curl_exec($curl);
 		if($output === FALSE)

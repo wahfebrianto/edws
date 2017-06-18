@@ -10,7 +10,7 @@ class Restaurant extends Model {
     public $timestamps = false;
 
     protected $fillable = ['NAME','ADDRESS','PHONE','EMAIL','TIME_OPEN','LATITUDE','LONGITUDE','BIO','USERNAME','PASSWORD','STATUS'];
-    protected $hidden = ['TIME_OPEN'];
+    protected $hidden = ['TIME_OPEN', 'PASSWORD'];
 
     public function time_open()
     {

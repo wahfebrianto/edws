@@ -20,6 +20,8 @@ class User extends Model {
       'STATUS'
     ];
 
+    protected $hidden = ['PASSWORD'];
+
     public function user_rate()
     {
       return $this->hasMany('Models\User_rate', 'USER_NO', 'NO');
