@@ -56,13 +56,16 @@
                     <li class="hidden">
                         <a href="#page-top"></a>
                     </li>
-                    <li class="page-scroll">
+					<li class="page-scroll" style="<?php echo (isset($_SESSION['NAME'])?"":"display:none") ?>">
+                        <a href="#portfolio1">User Data</a>
+                    </li>
+                    <li class="page-scroll" style="<?php echo (isset($_SESSION['NAME'])?"display:none":"") ?>">
                         <a href="#portfolio">Login</a>
                     </li>
                     <li class="page-scroll">
                         <a href="#about">API-Documentation</a>
                     </li>
-                    <li class="page-scroll">
+                    <li class="page-scroll" style="<?php echo (isset($_SESSION['NAME'])?"display:none":"") ?>">
                         <a href="#contact">Register</a>
                     </li>
                 </ul>
@@ -89,7 +92,7 @@
     </header>
 
     <!-- Portfolio Grid Section -->
-    <section id="portfolio" style="background-color:#ECECEA <?php echo (isset($_SESSION['NAME'])?";display:none":"" ?>">
+    <section id="portfolio" style="background-color:#ECECEA <?php echo (isset($_SESSION['NAME'])?";display:none":"") ?>">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12 text-center">
@@ -124,6 +127,34 @@
                             </div>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+    </section>
+	
+	<!-- Portfolio Grid Section -->
+    <section id="portfolio1" style="background-color:#ECECEA <?php echo (isset($_SESSION['NAME'])?"":";display:none") ?>">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2>User Data</h2>
+                    <hr class="star-primary">
+                </div>
+            </div>
+			<div class="row">
+                <div class="col-lg-8 col-lg-offset-2 text-center" style="font-weight:bold">
+                    <?php
+						if(isset($_SESSION['NAME']))
+						{
+							echo "Name : ".$_SESSION['NAME']."</br>";
+							echo "Address : ".$_SESSION['ADDRESS']."</br>";
+							echo "Phone : ".$_SESSION['PHONE']."</br>";
+							echo "Username : ".$_SESSION['USERNAME']."</br>";
+							echo "APIKEY : ".$_SESSION['APIKEY']."</br>";
+						}
+					?>
+					</br>
+					<button type="button" onclick="logout()" class="btn btn-success btn-lg">Logout</button>
                 </div>
             </div>
         </div>
@@ -1135,7 +1166,7 @@
     </section>
 
     <!-- Contact Section -->
-    <section id="contact" style="background-color:#ECECEA">
+    <section id="contact" style="background-color:#ECECEA <?php echo (isset($_SESSION['NAME'])?";display:none":"") ?>">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12 text-center">
@@ -1221,6 +1252,7 @@
     <script src="bootstraps/vendor/jquery/jquery.min.js"></script>
     <script src="bootstraps/js/register.js"></script>
     <script src="bootstraps/js/login.js"></script>
+	<script src="bootstraps/js/logout.js"></script>
     <script src="bootstraps/js/curltest.js"></script>
     <script src="bootstraps/js/sweetalert.min.js"></script>
     <script src="bootstraps/js/sweetalert-dev.js"></script>

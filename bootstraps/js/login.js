@@ -17,6 +17,7 @@ function ceklogin()
 				document.getElementById("password").value = "";
 				//var temp1 = data.split(",");
 				swal("Success!", "Login Success, Here is Your Data : \n"+data, "success");
+				location.reload();
 				//alert("Register Succes. Your API-KEY is : "+temp1[1]);
 			}
 			else

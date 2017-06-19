@@ -72,8 +72,13 @@ $app->get('/restaurant/rating/{id}', function($request, $response) {
 	  $apikey = $request->getHeader('apikey');
 	  new Database("dbrestaurant_".Company::where(["APIKEY" => $apikey])->value('username'));
 	  $id = $request->getAttribute('id');
-	  $restaurant_rate["result"] = Restaurant::where(["NO" => $id])->first();
-	  $restaurant_rate["result"] = ($restaurant_rate["result"] == null)?0:$restaurant_rate["result"]->getRating();
+
+	  $restaurant_rate["result"] = Restaurant::where(["NO" => $id])->first()->getRating();
+	  
+	  if($restaurant_rate["result"] == null){
+		  $restaurant_rate["result"] = 0;
+	  }
+	  
 	  return $response->withStatus(200)->withJSON($restaurant_rate);
   }
   catch(Exception $e){
@@ -424,11 +429,11 @@ $app->post('/rate', function($request,$response){
     $user_rate = User_rate::where($myArray)->first();
     if($user_rate===null)
     {
-      $myArray += ["RATE" => $param["RATE"]];
+      $myArray += ["RATE" => $param["rate"]];
       User_rate::create($myArray);
     }
     else {
-      User_rate::where($myArray)->update(["RATE" => $param["RATE"]]);
+      User_rate::where($myArray)->update(["RATE" => $param["rate"]]);
     }
     return $response->withStatus(200)->withJSON(["success"=>true]);
   } catch (Exception $e) {
